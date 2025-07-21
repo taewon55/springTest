@@ -22,7 +22,6 @@ jobs:
       - name: Build with Gradle
         run: |
           cd gittest
-          chmod +x ./gradlew
           ./gradlew clean build -x test
 
     # 4. Decode SSH Key (from base64 to private_key.pem)
