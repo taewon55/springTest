@@ -25,14 +25,14 @@ jobs:
           chmod +x ./gradlew
           ./gradlew clean build -x test
 
-      # 4. Decode SSH Key (EC2 PEM)
+    # 4. Decode SSH Key (from base64 to private_key.pem)
       - name: Decode SSH Key
         run: |
           echo "${{ secrets.DEV_SERVER_SSH_KEY }}" | base64 -d > private_key.pem
           chmod 600 private_key.pem
 
-      # 5. Copy JAR to Dev Server
-      - name: Copy JAR to Dev Server
+      # 5. Copy JAR to EC2
+      - name: Copy JAR to EC2
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.DEV_SERVER_HOST }}
@@ -40,9 +40,9 @@ jobs:
           key: private_key.pem
           port: 22
           source: gittest/build/libs/*.jar
-          target: /home/ec2-user/app/spring/
+          target: /home/ubuntu/app/
 
-      # 6. Restart Spring Boot App
+      # 6. Restart Spring Boot on EC2
       - name: Restart Spring Boot App
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -52,4 +52,4 @@ jobs:
           port: 22
           script: |
             pkill -f 'java -jar' || true
-            nohup java -jar /home/ec2-user/app/spring/*.jar > /home/ec2-user/app/spring/app.log 2>&1 &
+            nohup java -jar /home/ubuntu/app/*.jar > /home/ubuntu/app/app.log 2>&1 &
