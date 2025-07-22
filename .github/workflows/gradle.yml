@@ -45,8 +45,7 @@ jobs:
           username: ec2-user
           key_path: ./private_key.pem
           port: 22
-          source: spring/libs/*-SNAPSHOT.jar
-          exclude: spring/libs/*-plain.jar
+          source: build/libs/*-SNAPSHOT.jar
           target: /home/ec2-user/app/
 
       # 6. Restart Spring Boot on EC2
