@@ -66,10 +66,6 @@ jobs:
               echo "No process is using port 9090."
             fi
 
-            # 2. 최신 JAR 선택
-            JAR=$(ls -t /home/ec2-user/app/spring/*.jar | grep -v plain | head -n 1)
-            echo "Starting JAR: $JAR"
-
             # 3. 실행
-            nohup java -jar "$JAR" > /home/ec2-user/app/spring/app.log 2>&1 &
+             nohup java -jar /home/ec2-user/app/spring/build/libs/gittest-0.0.1-SNAPSHOT.jar > /home/ec2-user/app/spring/app.log 2>&1 &
 
