@@ -39,7 +39,7 @@ jobs:
           username: ${{ secrets.DEV_SERVER_USER }}
           key: private_key.pem
           port: 22
-          source: gittest/build/libs/*.jar
+          source: build/libs/*.jar
           target: /home/ubuntu/app/
 
       # 6. Restart Spring Boot on EC2
