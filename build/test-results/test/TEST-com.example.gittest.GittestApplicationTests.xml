@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.gittest.GittestApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-07-18T01:48:17.637Z" hostname="gongpputim-ui-iMac.local" time="1.259">
+  <properties/>
+  <testcase name="contextLoads()" classname="com.example.gittest.GittestApplicationTests" time="1.259"/>
+  <system-out><![CDATA[10:48:15.762 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.gittest.GittestApplicationTests]: GittestApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:48:15.917 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.example.gittest.GittestApplication for test class com.example.gittest.GittestApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.7)
+
+2025-07-18T10:48:16.287+09:00  INFO 24183 --- [gittest] [    Test worker] c.e.gittest.GittestApplicationTests      : Starting GittestApplicationTests using Java 17.0.11 with PID 24183 (started by gongpputim in /Users/gongpputim/Desktop/mydev/gittest/gittest)
+2025-07-18T10:48:16.288+09:00  INFO 24183 --- [gittest] [    Test worker] c.e.gittest.GittestApplicationTests      : No active profile set, falling back to 1 default profile: "default"
+2025-07-18T10:48:17.616+09:00  INFO 24183 --- [gittest] [    Test worker] c.e.gittest.GittestApplicationTests      : Started GittestApplicationTests in 1.543 seconds (process running for 3.291)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
