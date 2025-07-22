@@ -37,7 +37,7 @@ jobs:
       - name: Check if private key exists
         run: ls -al private_key.pem
 
-      # 5. Copy JAR to EC2
+      # Copy JAR to EC2
       - name: Copy JAR to EC2
         uses: appleboy/scp-action@v0.1.3
         with:
@@ -46,19 +46,18 @@ jobs:
           key_path: ./private_key.pem
           port: 22
           source: build/libs/*-SNAPSHOT.jar
-          target: /home/ec2-user/app/
+          target: /home/ec2-user/app/spring/build/libs/
 
-      # 6. Restart Spring Boot on EC2
-      - name: Restart Spring Boot App
+      # Restart Spring Boot App
+      - name: Restart Spring Boot on EC2
         uses: appleboy/ssh-action@v1.0.0
-        continue-on-error: true
         with:
           host: ${{ secrets.DEV_SERVER_HOST }}
           username: ec2-user
           key_path: ./private_key.pem
           port: 22
           script: |
-            # 1. 9090포트 사용 중인 프로세스 종료
+            # 1. Kill existing process on port 9090
             PID=$(sudo lsof -ti tcp:9090 -sTCP:LISTEN)
             if [ -n "$PID" ]; then
               echo "Killing process on port 9090: $PID"
@@ -66,11 +65,11 @@ jobs:
             else
               echo "No process is using port 9090."
             fi
-      
-            # 2. 최신 JAR 경로에서 실행
-            JAR=$(ls -t /home/ec2-user/app/build/libs/*.jar | grep -v plain | head -n 1)
+
+            # 2. Find latest JAR (excluding *plain.jar)
+            JAR=$(ls -t /home/ec2-user/app/spring/build/libs/*.jar | grep -v plain | head -n 1)
             echo "Starting JAR: $JAR"
-      
-            # 3. Spring Boot 실행
-            nohup java -jar "$JAR" > /home/ec2-user/app/app.log 2>&1 &
+
+            # 3. Run Spring Boot App
+            nohup java -jar "$JAR" > /home/ec2-user/app/spring/app.log 2>&1 &
 
