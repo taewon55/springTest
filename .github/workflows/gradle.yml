@@ -58,5 +58,19 @@ jobs:
           key_path: ./private_key.pem
           port: 22
           script: |
-            pkill -f 'java -jar' || true
-            nohup java -jar /home/ec2-user/app/build/libs/*.jar > /home/ec2-user/app/app.log 2>&1 &
+            # 1. 9090포트 사용 중인 프로세스 종료
+            PID=$(sudo lsof -ti tcp:9090 -sTCP:LISTEN)
+            if [ -n "$PID" ]; then
+              echo "Killing process on port 9090: $PID"
+              sudo kill -9 $PID
+            else
+              echo "No process is using port 9090."
+            fi
+      
+            # 2. 최신 JAR 경로에서 실행
+            JAR=$(ls -t /home/ec2-user/app/build/libs/*.jar | grep -v plain | head -n 1)
+            echo "Starting JAR: $JAR"
+      
+            # 3. Spring Boot 실행
+            nohup java -jar "$JAR" > /home/ec2-user/app/app.log 2>&1 &
+
