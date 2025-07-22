@@ -20,9 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        run: |
-          cd gittest
-          ./gradlew clean build -x test
+        run: ./gradlew clean build -x test
 
     # 4. Decode SSH Key (from base64 to private_key.pem)
       - name: Decode SSH Key
