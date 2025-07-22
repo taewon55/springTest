@@ -45,7 +45,7 @@ jobs:
           username: ec2-user
           key_path: ./private_key.pem
           port: 22
-          source: spring/libs/*-SNAPSHOT.jar
+          source: build/libs/*-SNAPSHOT.jar
           target: /home/ec2-user/app/
 
       # 6. Restart Spring Boot on EC2
@@ -59,4 +59,4 @@ jobs:
           port: 22
           script: |
             pkill -f 'java -jar' || true
-            nohup java -jar /home/ec2-user/app/spring/libs/*.jar > /home/ec2-user/app/app.log 2>&1 &
+            nohup java -jar /home/ec2-user/app/build/libs/*.jar > /home/ec2-user/app/app.log 2>&1 &
