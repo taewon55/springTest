@@ -22,8 +22,11 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      - name: Check key size
-        run:  echo "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" 
+      - name: Write secret to file
+        run: echo "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" > file.txt
+      
+      - name: Print file content
+        run: cat file.txt
         
       - name: Check key size
         run: echo "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" | wc -c
