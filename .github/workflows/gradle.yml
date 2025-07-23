@@ -23,6 +23,9 @@ jobs:
         run: ./gradlew clean build -x test
 
       - name: Check key size
+        run:  echo "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" 
+        
+      - name: Check key size
         run: echo "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" | wc -c
 
     # 4. Decode SSH Key (from base64 to private_key.pem)
