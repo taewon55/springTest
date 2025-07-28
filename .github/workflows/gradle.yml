@@ -23,11 +23,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      - name: Decode SSH Key
-        run: |
-          printf '%s' "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" | base64 -d > private_key.pem
-          chmod 600 private_key.pem
-
       - name: Save Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -39,12 +34,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
-      name: must-approve-first  # 여기서 승인 걸림
+      name: must-approve-first  # 여기서 승인 필요
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
