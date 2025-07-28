@@ -8,7 +8,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    environment:
+      name: must-approve-first
+      
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
