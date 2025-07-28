@@ -3,7 +3,7 @@ name: Build & Deploy with Approval
 on:
   push:
     branches:
-      - main
+      - main  # main 브랜치 push 시 실행
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      - name: Save Artifact
+      - name: Upload JAR as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: spring-jar
@@ -34,9 +34,12 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
-      name: must-approve-first  # 여기서 승인 필요
+      name: must-approve-first  # 환경에 대한 승인 필요
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
@@ -54,7 +57,7 @@ jobs:
           username: ec2-user
           key_path: ./private_key.pem
           port: 22
-          source: "*.jar"
+          source: spring-jar/*.jar
           target: /home/ec2-user/app/spring/
 
       - name: Restart Spring Boot App
@@ -65,9 +68,14 @@ jobs:
           key_path: ./private_key.pem
           port: 22
           script: |
+            # 포트 9090을 사용하는 기존 프로세스 종료
             PID=$(sudo lsof -ti tcp:9090 -sTCP:LISTEN)
             if [ -n "$PID" ]; then
               echo "Killing process on port 9090: $PID"
               sudo kill -9 $PID
+            else
+              echo "No process is using port 9090."
             fi
+
+            # 새 JAR 실행
             nohup java -jar /home/ec2-user/app/spring/*.jar > /home/ec2-user/app/spring/app.log 2>&1 &
