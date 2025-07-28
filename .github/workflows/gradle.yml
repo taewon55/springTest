@@ -1,16 +1,15 @@
-name: Build & Deploy to Dev Server
+name: Build & Deploy with Approval
 
 on:
   push:
     branches:
-      - main  # dev 브랜치 푸시 시 자동 실행
+      - main
 
 jobs:
-  build-and-deploy:
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    environment:
-      name: must-approve-first
-      
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -24,28 +23,38 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      - name: Write secret to file
-        run: echo "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" > file.txt
-      
-      - name: Print file content
-        run: cat file.txt
-        
-      - name: Check key size
-        run: echo "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" | wc -c
-
-    # 4. Decode SSH Key (from base64 to private_key.pem)
       - name: Decode SSH Key
         run: |
           printf '%s' "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" | base64 -d > private_key.pem
           chmod 600 private_key.pem
-      
-      - name: Show PEM key head
-        run: head -n 5 private_key.pem
 
-      - name: Check if private key exists
-        run: ls -al private_key.pem
+      - name: Save Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: spring-jar
+          path: build/libs/*.jar
 
-       # 배포용 JAR만 EC2로 복사
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: must-approve-first  # 여기서 승인 걸림
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: spring-jar
+
+      - name: Decode SSH Key
+        run: |
+          printf '%s' "${{ secrets.DEV_SERVER_SSH_KEY_2 }}" | base64 -d > private_key.pem
+          chmod 600 private_key.pem
+
       - name: Copy JAR to EC2
         uses: appleboy/scp-action@v0.1.3
         with:
@@ -53,10 +62,9 @@ jobs:
           username: ec2-user
           key_path: ./private_key.pem
           port: 22
-          source: build/libs/*-SNAPSHOT.jar
+          source: "*.jar"
           target: /home/ec2-user/app/spring/
 
-      # EC2에서 기존 앱 종료 및 재시작
       - name: Restart Spring Boot App
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -65,15 +73,9 @@ jobs:
           key_path: ./private_key.pem
           port: 22
           script: |
-            # 1. 기존 9090 포트 사용 중인 프로세스 종료
             PID=$(sudo lsof -ti tcp:9090 -sTCP:LISTEN)
             if [ -n "$PID" ]; then
               echo "Killing process on port 9090: $PID"
               sudo kill -9 $PID
-            else
-              echo "No process is using port 9090."
             fi
-
-            # 3. 실행
-             nohup java -jar /home/ec2-user/app/spring/build/libs/gittest-0.0.1-SNAPSHOT.jar > /home/ec2-user/app/spring/app.log 2>&1 &
-
+            nohup java -jar /home/ec2-user/app/spring/*.jar > /home/ec2-user/app/spring/app.log 2>&1 &
